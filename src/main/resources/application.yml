@@ -1,0 +1,159 @@
+#spring.datasource.url=jdbc:mysql://dev-staging.chvrsbdweoe1.ap-south-1.rds.amazonaws.com:3306/salesDataSetup?useSSL=false
+server:
+  port: 8008
+spring:
+  main:
+    allow-bean-definition-overriding: true
+  application:
+    name: api-gateway
+  #config:
+  #  import: optional:configserver:http://localhost:8888    
+  cloud:
+    gateway:
+      default-filters:
+        - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
+      globalcors:
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins: "*"
+            allowedMethods: "*"
+            allowedHeaders: "*"
+      routes:
+        - id: auth-service
+          uri: http://ec2-3-110-182-223.ap-south-1.compute.amazonaws.com:8009/ #http://localhost:8009/
+          predicates:
+          - Path=/auth/**
+          filters:
+            - AuthFilter
+        - id: sales-service
+          uri: http://automatestaging-1871827587.ap-south-1.elb.amazonaws.com:8081/ #http://localhost:8080/ #
+          predicates:
+            - Path=/sales/**
+          filters:
+            - AuthFilter
+        - id: pincode
+          uri: https://api.postalpincode.in/
+          predicates:
+            - Path=/pincode/**
+          filters:
+            - AuthFilter
+        - id: hrms
+          uri: http://automatestaging-1871827587.ap-south-1.elb.amazonaws.com:8088/
+          predicates:
+            - Path=/hrms/**
+          filters:
+            - AuthFilter
+        - id: ops
+          uri: http://automatestaging-1871827587.ap-south-1.elb.amazonaws.com:8084/
+          predicates:
+            - Path=/ops/**
+          filters:
+            - AuthFilter
+        - id: role-management
+          uri: http://automatestaging-1871827587.ap-south-1.elb.amazonaws.com:8089/
+          predicates:
+            - Path=/role-management/**
+          filters:
+            - AuthFilter
+        - id: inventory
+          uri: http://automatestaging-1871827587.ap-south-1.elb.amazonaws.com:8087/
+          predicates:
+            - Path=/inventory/**
+          filters:
+            - AuthFilter
+        - id: vehicle-services
+          uri:  http://automatestaging-1871827587.ap-south-1.elb.amazonaws.com:8097/
+          predicates:
+            - Path=/vehicle-services/**
+          filters:
+            - AuthFilter
+        - id: dfdl
+          uri: http://automatestaging-1871827587.ap-south-1.elb.amazonaws.com:8083/
+          predicates:
+            - Path=/dfdl/**
+          filters:
+            - AuthFilter
+        - id: admin
+          uri: http://automatestaging-1871827587.ap-south-1.elb.amazonaws.com:8082/
+          predicates:
+            - Path=/admin/**
+          filters:
+            - AuthFilter
+        - id: notification-service
+          uri: http://automatestaging-1871827587.ap-south-1.elb.amazonaws.com:8086/
+          predicates:
+            - Path=/notification-service/**
+          filters:
+            - AuthFilter
+        - id: vehicle-information-service
+          uri: http://automatestaging-1871827587.ap-south-1.elb.amazonaws.com:8090/
+          predicates:
+            - Path=/vehicle-information-service/**
+          filters:
+            - AuthFilter
+        - id: customer-service
+          uri: http://automatestaging-1871827587.ap-south-1.elb.amazonaws.com:8085/
+          predicates:
+            - Path=/customer-service/**
+          filters:
+            - AuthFilter
+        - id: dfdg
+          uri: http://automatestaging-1871827587.ap-south-1.elb.amazonaws.com:8091/
+          predicates:
+            - Path=/dfdg/**
+          filters:
+            - AuthFilter
+        - id: dfdr
+          uri: http://automatestaging-1871827587.ap-south-1.elb.amazonaws.com:8093/
+          predicates:
+            - Path=/dfdr/**
+          filters:
+            - AuthFilter
+        - id: etv-schd
+          uri: http://automatestaging-1871827587.ap-south-1.elb.amazonaws.com:8095/
+          predicates:
+            - Path=/etv-schd/**
+          filters:
+            - AuthFilter
+        - id: dfd
+          uri: http://automatestaging-1871827587.ap-south-1.elb.amazonaws.com:8092/
+          predicates:
+            - Path=/dfd/**
+          filters:
+            - AuthFilter
+        - id: NotificationMaster
+          uri: http://automatestaging-1871827587.ap-south-1.elb.amazonaws.com:8096/
+          predicates:
+            - Path=/notificationMaster/**
+          filters:
+            - AuthFilter
+    config:
+      uri: http://localhost:8888
+      fail-fast: false
+      retry:
+        maxAttempts: 20
+
+eureka:
+  client:
+    enabled: true
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka
+  instance:
+    prefer-ip-address: true
+
+logging:
+  level:
+    '[org.springframework.cloud.gateway]': WARN
+
+jwt:
+  secret: cYEbR0secretKey
+  validity: 10
+  authDisabled: false
+
+cyepro:
+  auth:
+    jwtSecret: cYEbR0secretKey
+    jwtExpirationMs: 604800000
+    jwtRefreshExpirationMs: 2592000000
+#cyepro.auth.jwtExpirationMs= 3600000
+#cyepro.auth.jwtRefreshExpirationMs= 86400000
